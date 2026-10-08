@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#FBF9F6">
+  <title>ЛеВита — прототип</title>
+  <!-- SDK Telegram и QR лежат в vendor/, чтобы не зависеть от внешних серверов -->
+  <script src="vendor/telegram-web-app.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Golos+Text:wght@400;500;600;700&family=Jost:wght@300;400&display=swap" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="styles.css">
+  <script src="vendor/qrcode.min.js"></script>
+</head>
+<body>
+  <div id="app" class="app">
+    <main id="view" class="view"></main>
+    <nav id="tabs" class="tabbar"></nav>
+  </div>
+  <div id="overlay" class="overlay" hidden><div id="sheet" class="sheet"></div></div>
+  <div id="toast" class="toast-wrap" hidden></div>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

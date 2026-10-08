@@ -1,0 +1,98 @@
+/* ЛеВита — дизайн-система v0.1 · токены
+   День = направление A «Галерея», ночь = направление B «Вечерний салон».
+   Тема переключается атрибутом data-theme="night" на <html>; без атрибута — день. */
+
+:root, .theme-day{
+  /* --- поверхности и текст: день --- */
+  --bg:#FBF9F6;            /* бумага */
+  --surface:#FFFFFF;       /* карточки, листы */
+  --surface-2:#F6F2EC;     /* вторичные плашки, чипы в карточках */
+  --fg:#1E1A17;            /* чернила */
+  --muted:#8A7A6E;         /* подписи, вторичный текст (тауп) */
+  --line:#E4DCD2;          /* волосяные линии, рамки */
+  --line-strong:#CFC4B8;
+  --overlay:rgba(30,26,23,.45);
+
+  /* --- акцент: винный днём --- */
+  --accent:#6B1F2A;
+  --accent-fg:#FFFFFF;
+  --accent-soft:#F1E6E4;   /* фон бейджей и выделений */
+  --accent-hover:#5A1A23;
+  --logo:#A58B66;          /* карамель логотипа, только для словесного знака */
+
+  /* --- статусы (отдельно от акцента) --- */
+  --ok:#3C7A5A;  --ok-soft:#E6F0EA;
+  --warn:#B7791F; --warn-soft:#F7EEDC;
+  --danger:#A13A3A; --danger-soft:#F6E3E3;
+
+  /* --- типографика --- */
+  --font-display:'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-body:'Golos Text', -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --font-logo:'Jost', 'Montserrat', Arial, sans-serif;
+  --fs-display:34px; --lh-display:1.05;
+  --fs-h1:28px;  --lh-h1:1.1;
+  --fs-h2:22px;  --lh-h2:1.15;
+  --fs-h3:18px;  --lh-h3:1.2;
+  --fs-body:15px; --lh-body:1.5;
+  --fs-small:13px;
+  --fs-caption:12px;
+  --fs-label:11px; --ls-label:.14em;
+
+  /* --- сетка, радиусы, тени --- */
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-8:32px;
+  --r-chip:4px; --r-btn:6px; --r-card:10px; --r-sheet:16px; --r-photo:6px;
+  --shadow-card:0 1px 2px rgba(30,26,23,.06);
+  --shadow-sheet:0 -8px 30px rgba(30,26,23,.12);
+  --tap:44px;
+
+  /* --- движение --- */
+  --dur-fast:120ms; --dur:200ms; --dur-slow:320ms;
+  --ease:cubic-bezier(.2,.7,.2,1);
+
+  color-scheme:light;
+}
+
+/* ночь: эспрессо, слоновая кость, золото фурнитуры */
+:root[data-theme="night"], .theme-night{
+  --bg:#17120F;
+  --surface:#1E1814;
+  --surface-2:#272019;
+  --fg:#F2EAE1;
+  --muted:#A4948A;
+  --line:#3A302A;
+  --line-strong:#4C3F37;
+  --overlay:rgba(0,0,0,.55);
+
+  --accent:#C9A46E;
+  --accent-fg:#17120F;
+  --accent-soft:#33281F;
+  --accent-hover:#D8B47F;
+  --logo:#CDB081;
+
+  --ok:#8FC3A5;  --ok-soft:#1F2E26;
+  --warn:#E0B462; --warn-soft:#332A18;
+  --danger:#E08A8A; --danger-soft:#3A2222;
+
+  --shadow-card:0 1px 2px rgba(0,0,0,.4);
+  --shadow-sheet:0 -8px 30px rgba(0,0,0,.5);
+  color-scheme:dark;
+}
+
+/* базовая типографика страницы */
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:var(--fs-body);line-height:var(--lh-body);-webkit-font-smoothing:antialiased}
+h1,h2,h3,.display{font-family:var(--font-display);font-weight:500;margin:0;text-wrap:balance}
+.display{font-size:var(--fs-display);line-height:var(--lh-display)}
+h1{font-size:var(--fs-h1);line-height:var(--lh-h1)}
+h2{font-size:var(--fs-h2);line-height:var(--lh-h2)}
+h3{font-size:var(--fs-h3);line-height:var(--lh-h3)}
+p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:var(--fs-small)}
+.caption{font-size:var(--fs-caption);color:var(--muted)}
+.label{font-size:var(--fs-label);letter-spacing:var(--ls-label);text-transform:uppercase;color:var(--muted);font-weight:600}
+.num{font-variant-numeric:tabular-nums}
+.price{font-weight:600;font-variant-numeric:tabular-nums}
+.wordmark{font-family:var(--font-logo);font-weight:300;letter-spacing:.3em;color:var(--logo);text-transform:uppercase}
+.wordmark small{display:block;font-size:.42em;letter-spacing:.3em;margin-top:.2em;color:var(--muted)}
+@media (prefers-reduced-motion: reduce){ *{transition:none !important;animation:none !important} }

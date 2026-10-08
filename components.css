@@ -1,0 +1,105 @@
+/* ЛеВита — дизайн-система v0.1 · компоненты. Только токены из tokens.css. */
+
+/* 1. Кнопки */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:var(--tap);padding:0 18px;border-radius:var(--r-btn);border:1px solid transparent;font:600 14px/1 var(--font-body);cursor:pointer;text-decoration:none;transition:background var(--dur-fast) var(--ease),opacity var(--dur-fast) var(--ease),border-color var(--dur-fast) var(--ease);-webkit-tap-highlight-color:transparent}
+.btn-primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.btn-primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.btn-secondary{background:transparent;color:var(--fg);border-color:var(--line-strong)}
+.btn-secondary:hover{background:var(--surface-2)}
+.btn-ghost{background:transparent;color:var(--accent);padding:0 8px;min-height:36px}
+.btn-sm{min-height:36px;padding:0 12px;font-size:13px}
+.btn-block{width:100%}
+.btn[disabled],.btn.is-disabled{opacity:.45;pointer-events:none}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* 2. Чипы и размерная сетка */
+.chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:13px;color:var(--fg);white-space:nowrap}
+.chip.is-active{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.sizes{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px}
+.size{position:relative;height:40px;border-radius:var(--r-chip);border:1px solid var(--line);background:var(--surface);display:flex;align-items:center;justify-content:center;font:600 14px/1 var(--font-body);font-variant-numeric:tabular-nums;color:var(--fg);cursor:pointer;transition:background var(--dur-fast) var(--ease),border-color var(--dur-fast) var(--ease)}
+.size:hover{border-color:var(--line-strong)}
+.size.is-last::after{content:"";position:absolute;right:6px;top:6px;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.size.is-none{border-style:dashed;color:var(--muted);font-weight:400;background:transparent}
+.size.is-selected{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.size.is-mine:not(.is-selected){border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.size-legend{display:flex;flex-wrap:wrap;gap:12px;font-size:var(--fs-caption);color:var(--muted)}
+.size-legend i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-right:5px;vertical-align:middle}
+.size-legend u{text-decoration:none;display:inline-block;width:10px;height:10px;border:1px dashed var(--muted);border-radius:2px;margin-right:5px;vertical-align:middle}
+
+/* 3. Карточки и строки списков */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:14px 16px;box-shadow:var(--shadow-card)}
+.card-soft{background:var(--surface-2);border:none;box-shadow:none}
+.row{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line);min-width:0}
+.row:first-child{border-top:none}
+.row .thumb{width:48px;height:60px;border-radius:var(--r-photo);object-fit:cover;background:var(--surface-2)}
+.row .title{font-weight:500;line-height:1.3}
+.row .sub{font-size:var(--fs-small);color:var(--muted)}
+.row.row-plain{grid-template-columns:1fr auto}
+.list{display:flex;flex-direction:column}
+
+/* 4. Статусы и бейджи */
+.badge{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:999px;font:600 11px/1 var(--font-body);letter-spacing:.04em;text-transform:uppercase;background:var(--accent-soft);color:var(--fg);white-space:nowrap}
+.badge-accent{background:var(--accent);color:var(--accent-fg)}
+.pill{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;font:600 12px/1 var(--font-body);white-space:nowrap}
+.pill-ok{background:var(--ok-soft);color:var(--ok)}
+.pill-warn{background:var(--warn-soft);color:var(--warn)}
+.pill-danger{background:var(--danger-soft);color:var(--danger)}
+.pill-neutral{background:var(--surface-2);color:var(--muted)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent)}
+
+/* 5. Поля ввода и поиск */
+.input{display:flex;align-items:center;gap:10px;height:var(--tap);padding:0 14px;border-radius:var(--r-btn);border:1px solid var(--line);background:var(--surface);color:var(--fg);font:15px var(--font-body)}
+.input input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:inherit;font:inherit}
+.input input::placeholder{color:var(--muted)}
+.input:focus-within{border-color:var(--accent)}
+.field{display:grid;gap:6px}
+.field > .label{font-size:var(--fs-caption);letter-spacing:.08em}
+.segmented{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--surface-2);border-radius:var(--r-btn);padding:3px;gap:3px}
+.segmented button{border:0;background:transparent;color:var(--muted);height:34px;border-radius:4px;font:600 13px var(--font-body);cursor:pointer}
+.segmented button.is-active{background:var(--surface);color:var(--fg);box-shadow:var(--shadow-card)}
+
+/* 6. Шапка экрана и нижняя навигация */
+.topbar{position:sticky;top:0;z-index:5;display:grid;grid-template-columns:44px 1fr 44px;align-items:center;height:52px;padding:0 6px;background:var(--bg);border-bottom:1px solid var(--line)}
+.topbar .title{text-align:center;font:600 15px var(--font-body)}
+.topbar .title.display{font:500 20px var(--font-display)}
+.icon-btn{width:44px;height:44px;border:0;background:transparent;color:var(--fg);border-radius:var(--r-btn);display:inline-flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer}
+.tabbar{position:sticky;bottom:0;z-index:5;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--bg);border-top:1px solid var(--line);padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px))}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;color:var(--muted);font:500 11px var(--font-body);border:0;background:transparent;cursor:pointer;letter-spacing:.02em}
+.tab .ico{width:22px;height:22px;display:block}
+.tab.is-active{color:var(--fg)}
+.tab.is-active .ico{color:var(--accent)}
+
+/* 7. Фото-плитки и карточка товара в каталоге */
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tile{display:grid;gap:8px;min-width:0;text-decoration:none;color:inherit}
+.tile .ph{position:relative;aspect-ratio:4/5;border-radius:var(--r-photo);overflow:hidden;background:var(--surface-2)}
+.tile .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.tile .ph .badge{position:absolute;left:8px;top:8px}
+.tile .name{font:500 14px/1.3 var(--font-body)}
+.tile .meta{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:var(--fs-caption);color:var(--muted)}
+.tile .meta .price{color:var(--fg);font-size:14px}
+.sizes-mini{font-size:var(--fs-caption);color:var(--muted);font-variant-numeric:tabular-nums}
+.sizes-mini b{color:var(--fg);font-weight:600}
+
+/* 8. Карта клуба */
+.club-card{position:relative;border-radius:14px;padding:18px;background:var(--surface);border:1px solid var(--line);display:grid;gap:10px;box-shadow:var(--shadow-card)}
+.club-card .level{font-size:var(--fs-label);letter-spacing:var(--ls-label);text-transform:uppercase;color:var(--muted);font-weight:600}
+.club-card .balance{font:500 40px/1 var(--font-display);font-variant-numeric:tabular-nums}
+.club-card .balance small{font:500 14px var(--font-body);color:var(--muted);margin-left:6px}
+.club-card .expiry{font-size:var(--fs-small);color:var(--muted)}
+.qr{display:grid;grid-template-columns:repeat(21,1fr);gap:1px;width:148px;aspect-ratio:1;margin:6px auto 0;background:#fff;padding:7px;border-radius:8px}
+.qr i{display:block;aspect-ratio:1;background:transparent}
+.qr i.on{background:#111}
+
+/* 9. Шторка снизу и тост */
+.sheet{background:var(--surface);border-radius:var(--r-sheet) var(--r-sheet) 0 0;padding:12px 16px calc(16px + env(safe-area-inset-bottom,0px));box-shadow:var(--shadow-sheet);display:grid;gap:12px}
+.sheet .grip{width:36px;height:4px;border-radius:2px;background:var(--line-strong);margin:0 auto 4px}
+.toast{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--r-card);background:var(--fg);color:var(--bg);font-size:14px;box-shadow:var(--shadow-sheet)}
+
+/* 10. Пустое состояние и разделители */
+.empty{display:grid;gap:8px;justify-items:center;text-align:center;padding:28px 16px;color:var(--muted)}
+.empty h3{color:var(--fg)}
+.divider{height:1px;background:var(--line);margin:4px 0}
+.stack{display:grid;gap:12px}
+.cluster{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.between{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
