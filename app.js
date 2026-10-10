@@ -1,5 +1,5 @@
 /* ЛеВита — кликабельный прототип Telegram Mini App (Вариант 2 «Клуб салона»).
-   Три роли: покупательница (по умолчанию), персонал (PIN 1111), кабинет владелицы (из меню персонала).
+   Три роли: покупательница (по умолчанию), персонал (PIN 1111), кабинет владельца (из меню персонала).
    Без сервера: состояние хранится в браузере, кнопка «Сбросить демо» в профиле. */
 (function () {
   'use strict';
@@ -89,7 +89,7 @@
     if (navigator.clipboard) navigator.clipboard.writeText(text + ' ' + url).then(() => toast('Ссылка скопирована')).catch(() => toast('Скопируйте: ' + url));
   }
   function scanQR(cb) {
-    if (tg && tg.showScanQrPopup && tg.isVersionAtLeast('6.4')) { tg.showScanQrPopup({ text: 'Наведите камеру на карту клиентки' }, txt => { cb(txt); return true; }); return; }
+    if (tg && tg.showScanQrPopup && tg.isVersionAtLeast('6.4')) { tg.showScanQrPopup({ text: 'Наведите камеру на карту клиента' }, txt => { cb(txt); return true; }); return; }
     openSheet(`<div class="grip"></div><h3>Сканер работает в Telegram</h3><p class="small muted">В браузере введите номер карты или телефон вручную.</p><div class="input"><input id="scan-in" placeholder="460252881380" inputmode="numeric"></div><button class="btn btn-primary btn-block" data-act="scan-manual">Найти</button>`);
   }
 
@@ -115,7 +115,7 @@
   function tabbar() {
     const h = location.hash || '#/catalog';
     const tabs = S.role === 'staff'
-      ? [['#/staff/today', ICONS.today, 'Сегодня'], ['#/staff/clients', ICONS.users, 'Клиентки'], ['#/staff/stock', ICONS.box, 'Наличие'], ['#/staff/more', ICONS.more, 'Ещё']]
+      ? [['#/staff/today', ICONS.today, 'Сегодня'], ['#/staff/clients', ICONS.users, 'Клиенты'], ['#/staff/stock', ICONS.box, 'Наличие'], ['#/staff/more', ICONS.more, 'Ещё']]
       : [['#/catalog', ICONS.grid, 'Каталог'], ['#/new', ICONS.spark, 'Новинки'], ['#/club', ICONS.card, 'Клуб'], ['#/profile', ICONS.user, 'Профиль']];
     return tabs.map(t => `<button class="tab ${h === t[0] ? 'is-active' : ''}" data-act="nav" data-to="${t[0]}">${t[1]}${t[2]}</button>`).join('');
   }
@@ -255,17 +255,17 @@
           ${bk.map(b => { const m = M(b.model), c = C(b.client); return `<div class="row ${b.status === 'pending' ? 'is-pending' : ''}"><img class="thumb" src="${photo(m)}" alt=""><div><div class="title">${esc(c.name)} · ${esc(m.name)}${isShoes(m) ? ' · ' + b.size : ''}</div><div class="sub">${b.status === 'pending' ? 'запрос ' + esc(b.created) : 'отложено до ' + esc(b.until)}</div><div class="act" style="margin-top:6px">${b.status === 'pending' ? `<button class="btn btn-primary" data-act="b-confirm" data-id="${b.id}">Подтвердить</button><button class="btn btn-secondary" data-act="b-notfound" data-id="${b.id}">Не нашли</button>` : `<button class="btn btn-primary" data-act="b-done" data-id="${b.id}">Куплена</button><button class="btn btn-secondary" data-act="b-release" data-id="${b.id}">Снять</button>`}</div></div>${statusPill(b)}</div>`; }).join('') || '<div class="empty"><h3>Броней нет</h3></div>'}
         </div></div>
         <div class="card"><div class="between"><h3>Запросы на размер</h3><span class="caption">лист ожидания</span></div><div class="list">
-          ${wl.map(w => { const m = M(w.model), c = C(w.client); return `<div class="row"><img class="thumb" src="${photo(m)}" alt=""><div><div class="title">${esc(c.name)} · ${esc(m.name)} · ${w.size}</div><div class="sub">ждёт с ${esc(w.created)} · сейчас ${stockOf(m, w.size) ? 'есть ' + stockOf(m, w.size) : 'нет'}</div></div><button class="btn btn-secondary btn-sm" data-act="arrive" data-m="${m.id}" data-s="${w.size}">Пришёл</button></div>`; }).join('') || '<div class="empty"><h3>Запросов нет</h3><p class="small">Когда клиентка нажмёт «Сообщить, когда появится», запрос появится здесь.</p></div>'}
+          ${wl.map(w => { const m = M(w.model), c = C(w.client); return `<div class="row"><img class="thumb" src="${photo(m)}" alt=""><div><div class="title">${esc(c.name)} · ${esc(m.name)} · ${w.size}</div><div class="sub">ждёт с ${esc(w.created)} · сейчас ${stockOf(m, w.size) ? 'есть ' + stockOf(m, w.size) : 'нет'}</div></div><button class="btn btn-secondary btn-sm" data-act="arrive" data-m="${m.id}" data-s="${w.size}">Пришёл</button></div>`; }).join('') || '<div class="empty"><h3>Запросов нет</h3><p class="small">Когда клиент нажмёт «Сообщить, когда появится», запрос появится здесь.</p></div>'}
         </div></div>
       </div>`;
   }
   function vStaffClients() {
     const q = (S.cq || '').toLowerCase();
     const list = D.clients.filter(c => !q || (c.name + c.phone + c.card).toLowerCase().includes(q));
-    return topbar('<span></span>', '<span class="display" style="font-size:20px">Клиентки</span>', `<button class="icon-btn" data-act="scan" aria-label="Сканировать QR">▣</button>`) +
+    return topbar('<span></span>', '<span class="display" style="font-size:20px">Клиенты</span>', `<button class="icon-btn" data-act="scan" aria-label="Сканировать QR">▣</button>`) +
       `<div class="screen">
         <div class="input"><span>⌕</span><input placeholder="Имя, телефон или номер карты" value="${esc(S.cq || '')}" data-live="cq"></div>
-        <button class="btn btn-secondary btn-block" data-act="scan">Сканировать карту клиентки</button>
+        <button class="btn btn-secondary btn-block" data-act="scan">Сканировать карту клиента</button>
         <div class="card"><div class="list">${list.map(c => `<div class="row row-plain" data-act="client" data-id="${c.id}" style="cursor:pointer"><div><div class="title">${esc(c.name)} <span class="caption">· ${esc(c.phone)}</span></div><div class="sub">${c.level} · размер ${c.sizes.shoe} · была ${esc(c.last)}</div></div><span class="price num">${num(S.cb[c.id])}</span></div>`).join('')}</div></div>
       </div>`;
   }
@@ -283,9 +283,9 @@
     const lost = S.lost.slice().sort((a, b) => b.count - a.count);
     return topbar('<span></span>', '<span class="display" style="font-size:20px">Ещё</span>', '') +
       `<div class="screen">
-        <div class="card"><div class="between"><h3>Упущенный спрос</h3><span class="caption">за 30 дней</span></div><table class="table"><thead><tr><th>Модель</th><th>Размер</th><th class="num">Раз</th><th>Когда</th></tr></thead><tbody>${lost.map(l => `<tr><td>${esc(M(l.model).name)}</td><td>${l.size}</td><td class="num">${l.count}</td><td>${esc(l.last)}</td></tr>`).join('')}</tbody></table><p class="caption" style="margin-top:8px">Продавец фиксирует отказ кнопкой «Не было размера». Владелица видит, что дозаказать.</p></div>
+        <div class="card"><div class="between"><h3>Упущенный спрос</h3><span class="caption">за 30 дней</span></div><table class="table"><thead><tr><th>Модель</th><th>Размер</th><th class="num">Раз</th><th>Когда</th></tr></thead><tbody>${lost.map(l => `<tr><td>${esc(M(l.model).name)}</td><td>${l.size}</td><td class="num">${l.count}</td><td>${esc(l.last)}</td></tr>`).join('')}</tbody></table><p class="caption" style="margin-top:8px">Продавец фиксирует отказ кнопкой «Не было размера». Владелец видит, что дозаказать.</p></div>
         <div class="card"><div class="list">
-          <div class="row row-plain"><div><div class="title">Кабинет владелицы</div><div class="sub">выручка, клуб, брони, дайджест</div></div><button class="btn btn-secondary btn-sm" data-act="nav" data-to="#/owner">Открыть</button></div>
+          <div class="row row-plain"><div><div class="title">Кабинет владельца</div><div class="sub">выручка, клуб, брони, дайджест</div></div><button class="btn btn-secondary btn-sm" data-act="nav" data-to="#/owner">Открыть</button></div>
           <div class="row row-plain"><div><div class="title">Приёмка и инвентаризация</div><div class="sub">открывается МойСклад</div></div><button class="btn btn-secondary btn-sm" data-act="toast" data-t="В прототипе: открылся бы МойСклад">Открыть</button></div>
           <div class="row row-plain"><div><div class="title">Выйти из режима персонала</div><div class="sub">вернуться к экрану покупательницы</div></div><button class="btn btn-secondary btn-sm" data-act="staff-exit">Выйти</button></div>
         </div></div>
@@ -296,7 +296,7 @@
     const max = Math.max(...w.map(d => d.rev));
     const lost = S.lost.slice().sort((a, b) => b.count - a.count).slice(0, 4);
     const doneB = S.bookings.filter(b => b.status === 'done').length + 8, allB = S.bookings.length + 10;
-    return topbar(backBtn(), '<span class="display" style="font-size:20px">Кабинет владелицы</span>', '') +
+    return topbar(backBtn(), '<span class="display" style="font-size:20px">Кабинет владельца</span>', '') +
       `<div class="screen">
         <div class="segmented">${[['today', 'Сегодня'], ['week', 'Неделя'], ['month', 'Месяц']].map(t => `<button class="${S.ownerPeriod === t[0] ? 'is-active' : ''}" data-act="period" data-v="${t[0]}">${t[1]}</button>`).join('')}</div>
         <div class="kpis">
@@ -312,7 +312,7 @@
           <div class="row row-plain"><div><div class="title">Спят больше 90 дней</div><div class="sub">не покупали с июня</div></div><span class="price num">23</span></div>
           <div class="row row-plain"><div><div class="title">Бонусы: начислено / списано</div><div class="sub">за неделю</div></div><span class="price num">21 400 / 8 300</span></div>
         </div></div>
-        <div class="card"><div class="label">Дайджест недели · ${S.mailingApproved ? 'рассылка одобрена' : 'ждёт одобрения'}</div><h3 style="margin:6px 0">Привезли 6 моделей 38-го размера</h3><p class="small muted">Предлагаю написать 12 клиенткам с 38-м размером, которые не покупали больше двух месяцев: «В салоне новые лодочки и ботинки вашего размера. Отложить на примерку можно в приложении». Сообщение уйдёт только тем, кто согласился на рассылки.</p><div class="cluster" style="margin-top:10px">${S.mailingApproved ? '<span class="pill pill-ok">Уйдёт сегодня в 12:00</span>' : `<button class="btn btn-primary btn-sm" data-act="approve">Одобрить рассылку</button><button class="btn btn-secondary btn-sm" data-act="toast" data-t="Черновик открыт для правки">Изменить текст</button>`}</div></div>
+        <div class="card"><div class="label">Дайджест недели · ${S.mailingApproved ? 'рассылка одобрена' : 'ждёт одобрения'}</div><h3 style="margin:6px 0">Привезли 6 моделей 38-го размера</h3><p class="small muted">Предлагаю написать 12 клиентам с 38-м размером, которые не покупали больше двух месяцев: «В салоне новые лодочки и ботинки вашего размера. Отложить на примерку можно в приложении». Сообщение уйдёт только тем, кто согласился на рассылки.</p><div class="cluster" style="margin-top:10px">${S.mailingApproved ? '<span class="pill pill-ok">Уйдёт сегодня в 12:00</span>' : `<button class="btn btn-primary btn-sm" data-act="approve">Одобрить рассылку</button><button class="btn btn-secondary btn-sm" data-act="toast" data-t="Черновик открыт для правки">Изменить текст</button>`}</div></div>
         <div class="cluster"><button class="btn btn-secondary btn-sm" data-act="toast" data-t="В прототипе: выгрузка в Excel">Экспорт в Excel</button><button class="btn btn-secondary btn-sm" data-act="toast" data-t="В прототипе: открылся бы кабинет «Бонус Плюс»">Правила бонусов</button></div>
       </div>`;
   }
@@ -331,7 +331,7 @@
       <div class="club-card" style="padding:14px"><div class="level">Баланс</div><div class="balance num" style="font-size:32px">${num(S.cb[c.id])}<small>бонусов</small></div><div class="expiry">${c.expiring ? num(c.expiring.sum) + ' сгорят ' + c.expiring.date + ' · ' : ''}размер ${c.sizes.shoe} · всего покупок на ${fmt(c.spent)}${c.birthday ? ' · ДР ' + c.birthday : ''}</div></div>
       <div class="cluster"><button class="btn btn-primary btn-sm" data-act="accrue-ask" data-id="${c.id}">Начислить по чеку</button><button class="btn btn-secondary btn-sm" data-act="redeem-ask" data-id="${c.id}">Списать</button><button class="btn btn-secondary btn-sm" data-act="link-ask" data-id="${c.id}">Привязать чек с кассы</button></div>
       <div class="card"><div class="label" style="margin-bottom:6px">Покупки</div><div class="list">${c.purchases.map(p => `<div class="row row-plain"><div><div class="title">${esc(M(p.model).name)}</div><div class="sub">${esc(p.date)}</div></div><span class="price num">${fmt(p.sum)}</span></div>`).join('')}</div></div>
-      <p class="caption">Бонусы на кассе Эвотора считает «Бонус Плюс»; здесь продавец видит клиентку, её размеры и брони.</p>`);
+      <p class="caption">Бонусы на кассе Эвотора считает «Бонус Плюс»; здесь продавец видит клиента, его размеры и брони.</p>`);
   }
   function openStock(mid) {
     const m = M(mid);
@@ -339,7 +339,7 @@
     openSheet(`<div class="grip"></div><div class="row" style="border:0;padding:0"><img class="thumb" src="${photo(m)}" alt=""><div><h3>${esc(m.name)}</h3><p class="small muted">${fmt(m.price)} · ${esc(m.color)}</p></div></div>${line}
       ${isShoes(m) ? `<div class="field"><span class="label">Размер</span><div class="sizes pick">${D.SIZES.map(s => `<button class="size ${S.stockSel === s ? 'is-selected' : ''}" data-act="stock-pick" data-m="${m.id}" data-s="${s}">${s}</button>`).join('')}</div></div>` : ''}
       <div class="cluster"><button class="btn btn-primary btn-sm" data-act="arrive" data-m="${m.id}" data-s="${isShoes(m) ? (S.stockSel || '') : 'one'}">Поступление +1</button><button class="btn btn-secondary btn-sm" data-act="lost-add" data-m="${m.id}" data-s="${isShoes(m) ? (S.stockSel || '') : 'one'}">Не было размера</button></div>
-      <p class="caption">Поступление в приложении — только для демо: в системе приход делается в МойСкладе, остатки приходят оттуда, а клиентки из листа ожидания получают сообщение сами.</p>`);
+      <p class="caption">Поступление в приложении — только для демо: в системе приход делается в МойСкладе, остатки приходят оттуда, а клиенты из листа ожидания получают сообщение сами.</p>`);
   }
 
   /* ---------- действия ---------- */
@@ -359,8 +359,8 @@
     pushInbox('Сообщим, когда появится ' + m.name + (s !== 'one' ? ', ' + s : '') + '.', '#/club');
     save(); closeSheet(); haptic('success'); toast('Запрос на размер записан'); render();
   }
-  function confirmBooking(id) { const b = S.bookings.find(x => x.id === id); if (!b) return; b.status = 'held'; b.until = 'завтра, 20:00'; if (b.client === ME) pushInbox('Пара отложена: ' + M(b.model).name + (b.size ? ', ' + b.size : '') + '. Ждёт вас в салоне до завтра, 20:00.', '#/club'); save(); haptic('success'); toast('Подтверждено, клиентке ушло сообщение'); render(); }
-  function notFound(id) { const b = S.bookings.find(x => x.id === id); if (!b) return; b.status = 'cancelled'; addLost(b.model, b.size); if (b.client === ME) pushInbox('К сожалению, ' + M(b.model).name + (b.size ? ' в ' + b.size : '') + ' сейчас нет. Мы записали ваш размер и сообщим, когда привезём.', '#/club'); if (!S.waitlist.find(w => w.client === b.client && w.model === b.model && w.size === b.size)) S.waitlist.unshift({ id: 'w' + Date.now(), client: b.client, model: b.model, size: b.size, created: 'сегодня' }); save(); haptic('warning'); toast('Отмечено в упущенном спросе, клиентка в листе ожидания'); render(); }
+  function confirmBooking(id) { const b = S.bookings.find(x => x.id === id); if (!b) return; b.status = 'held'; b.until = 'завтра, 20:00'; if (b.client === ME) pushInbox('Пара отложена: ' + M(b.model).name + (b.size ? ', ' + b.size : '') + '. Ждёт вас в салоне до завтра, 20:00.', '#/club'); save(); haptic('success'); toast('Подтверждено, клиенту ушло сообщение'); render(); }
+  function notFound(id) { const b = S.bookings.find(x => x.id === id); if (!b) return; b.status = 'cancelled'; addLost(b.model, b.size); if (b.client === ME) pushInbox('К сожалению, ' + M(b.model).name + (b.size ? ' в ' + b.size : '') + ' сейчас нет. Мы записали ваш размер и сообщим, когда привезём.', '#/club'); if (!S.waitlist.find(w => w.client === b.client && w.model === b.model && w.size === b.size)) S.waitlist.unshift({ id: 'w' + Date.now(), client: b.client, model: b.model, size: b.size, created: 'сегодня' }); save(); haptic('warning'); toast('Отмечено в упущенном спросе, клиент в листе ожидания'); render(); }
   function doneBooking(id) { const b = S.bookings.find(x => x.id === id); if (!b) return; const m = M(b.model); b.status = 'done'; const key = b.size || 'one'; if (S.stock[m.id][key] > 0) S.stock[m.id][key]--; accrue(b.client, m.price, m.name); save(); haptic('success'); toast('Покупка отмечена, бонусы начислены'); render(); }
   function release(id) { const b = S.bookings.find(x => x.id === id); if (!b) return; b.status = 'cancelled'; if (b.client === ME) pushInbox('Бронь на ' + M(b.model).name + ' снята. Если ещё нужна, отложите заново.', '#/club'); save(); toast('Бронь снята'); render(); }
   function accrue(cid, sum, title) {
@@ -375,7 +375,7 @@
     const m = M(mid); const key = size === 'one' || !size ? 'one' : +size; if (key !== 'one' && !D.SIZES.includes(key)) { toast('Выберите размер'); return; }
     S.stock[m.id][key] = (S.stock[m.id][key] || 0) + 1;
     let n = 0; S.waitlist.forEach(w => { if (w.model === m.id && (key === 'one' || w.size === key) && !w.notified) { w.notified = true; n++; if (w.client === ME) pushInbox('Появился ваш размер: ' + m.name + (key !== 'one' ? ', ' + key : '') + '. Отложить на примерку →', '#/model/' + m.id); } });
-    save(); closeSheet(); haptic('success'); toast(n ? 'Поступление записано, сообщили ' + plural(n, 'клиентке', 'клиенткам', 'клиенткам') : 'Поступление записано'); render();
+    save(); closeSheet(); haptic('success'); toast(n ? 'Поступление записано, сообщили ' + plural(n, 'клиенту', 'клиентам', 'клиентам') : 'Поступление записано'); render();
   }
 
   /* ---------- делегирование кликов ---------- */
@@ -404,7 +404,7 @@
       case 'share-model': { const m = M(d.m); shareText('Смотри, какие ' + m.name.toLowerCase() + ' в ЛеВите: ' + fmt(m.price), 'https://t.me/' + BOT + '?startapp=model_' + m.id); break; }
       case 'share-ref': shareText('Приглашаю в клуб салона обуви ЛеВита: 500 бонусов на первую покупку по моей ссылке', 'https://t.me/' + BOT + '?startapp=ref_' + D.me.card); break;
       case 'card-big': openSheet(`<div class="grip"></div><h3 style="text-align:center">Карта клуба</h3><div class="qrbox" data-qrtext="${esc(D.me.card)}" data-qrsize="220"></div><p class="caption" style="text-align:center">${esc(D.me.card)} · ${esc(myName())} · ${levelOf(S.spent).name}</p><p class="small" style="text-align:center">Кассир сканирует код сканером терминала, бонусы начислятся и спишутся в чеке.</p><button class="btn btn-secondary btn-block" data-act="close">Закрыть</button>`); break;
-      case 'rules': openSheet(`<div class="grip"></div><h3>Правила клуба</h3><div class="stack small"><p>Бонусы начисляются с каждой покупки: Серебро 5 %, Золото 7 % от 60 000 ₽ за год, Платина 10 % от 150 000 ₽.</p><p>1 бонус = 1 ₽. Списать можно до 30 % чека. Бонусы активируются через 14 дней после покупки и действуют 365 дней; подарочные — по сроку подарка.</p><p>При возврате товара бонусы за него аннулируются. На уценённые модели бонусы не начисляются.</p><p>Это демо-текст; правила салона утверждает владелица, полный текст — публичная оферта клуба.</p></div><button class="btn btn-secondary btn-block" data-act="close">Понятно</button>`); break;
+      case 'rules': openSheet(`<div class="grip"></div><h3>Правила клуба</h3><div class="stack small"><p>Бонусы начисляются с каждой покупки: Серебро 5 %, Золото 7 % от 60 000 ₽ за год, Платина 10 % от 150 000 ₽.</p><p>1 бонус = 1 ₽. Списать можно до 30 % чека. Бонусы активируются через 14 дней после покупки и действуют 365 дней; подарочные — по сроку подарка.</p><p>При возврате товара бонусы за него аннулируются. На уценённые модели бонусы не начисляются.</p><p>Это демо-текст; правила салона утверждает владелец, полный текст — публичная оферта клуба.</p></div><button class="btn btn-secondary btn-block" data-act="close">Понятно</button>`); break;
       case 'mysize': S.mySize = +d.s; save(); haptic('light'); render(); break;
       case 'theme': S.theme = d.v; save(); applyTheme(); render(); break;
       case 'consent': S.consentAds = !S.consentAds; save(); toast(S.consentAds ? 'Будем писать о новинках и показах' : 'Рекламные сообщения выключены, сервисные остаются'); render(); break;
@@ -413,7 +413,7 @@
       case 'pin': openPin(); break;
       case 'pin-key': { if (d.k === '⌫') S.pin = (S.pin || '').slice(0, -1); else if ((S.pin || '').length < 4) S.pin = (S.pin || '') + d.k; const dots = document.querySelectorAll('#pin-dots i'); dots.forEach((x, i) => x.classList.toggle('on', i < S.pin.length)); if (S.pin.length === 4) { if (S.pin === '1111') { S.staffOk = true; S.role = 'staff'; save(); closeSheet(); haptic('success'); nav('#/staff/today'); } else { S.pin = ''; dots.forEach(x => x.classList.remove('on')); haptic('error'); toast('Неверный PIN. Демо: 1111'); } } break; }
       case 'guide': openSheet(`<div class="grip"></div><h3>Как смотреть демо</h3><div class="stack">
-        ${[['Каталог', 'откройте лодочки, выберите 38 — «Отложить на примерку»'], ['Новинки', 'переключите «В моём размере», запишитесь на закрытый показ'], ['Клуб', 'карта с QR, «Показать на кассе», история бонусов, приглашение'], ['Профиль → Для персонала', 'PIN 1111: на экране «Сегодня» подтвердите вашу бронь, потом «Куплена»'], ['Наличие', 'откройте модель, «Не было размера» и «Поступление +1» — клиентка получит сообщение'], ['Ещё → Кабинет владелицы', 'цифры недели, упущенный спрос, «Одобрить рассылку»'], ['Профиль', 'переключите тему и сбросьте демо перед следующим показом']].map((s, i) => `<div class="step"><b>${i + 1}</b><div><div class="small" style="font-weight:600">${s[0]}</div><div class="small muted">${s[1]}</div></div></div>`).join('')}
+        ${[['Каталог', 'откройте лодочки, выберите 38 — «Отложить на примерку»'], ['Новинки', 'переключите «В моём размере», запишитесь на закрытый показ'], ['Клуб', 'карта с QR, «Показать на кассе», история бонусов, приглашение'], ['Профиль → Для персонала', 'PIN 1111: на экране «Сегодня» подтвердите вашу бронь, потом «Куплена»'], ['Наличие', 'откройте модель, «Не было размера» и «Поступление +1» — клиент получит сообщение'], ['Ещё → Кабинет владельца', 'цифры недели, упущенный спрос, «Одобрить рассылку»'], ['Профиль', 'переключите тему и сбросьте демо перед следующим показом']].map((s, i) => `<div class="step"><b>${i + 1}</b><div><div class="small" style="font-weight:600">${s[0]}</div><div class="small muted">${s[1]}</div></div></div>`).join('')}
         </div><button class="btn btn-secondary btn-block" data-act="close">Закрыть</button>`); break;
       case 'reset': openSheet(`<div class="grip"></div><h3>Сбросить демо?</h3><p class="small muted">Вернутся исходные брони, бонусы и остатки.</p><button class="btn btn-primary btn-block" data-act="reset-yes">Сбросить</button><button class="btn btn-secondary btn-block" data-act="close">Отмена</button>`); break;
       case 'reset-yes': try { localStorage.removeItem(KEY); } catch (x) {} S = fresh(); closeSheet(); applyTheme(); toast('Демо сброшено'); nav('#/catalog'); break;
@@ -425,13 +425,13 @@
       case 'accrue-do': { const sum = parseInt((document.getElementById('sum').value || '').replace(/\D/g, ''), 10); if (!sum) { toast('Введите сумму'); break; } const b = accrue(d.id, sum); save(); closeSheet(); haptic('success'); toast('Начислено ' + b + ' бонусов'); render(); break; }
       case 'redeem-ask': openSheet(`<div class="grip"></div><h3>Списать бонусы</h3><p class="small muted">${esc(C(d.id).name)} · доступно ${num(S.cb[d.id])}</p><div class="field"><span class="label">Сколько списать</span><div class="input"><input id="sum" inputmode="numeric" placeholder="до 30 % чека"></div></div><button class="btn btn-primary btn-block" data-act="redeem-do" data-id="${d.id}">Списать</button>`); break;
       case 'redeem-do': { const sum = parseInt((document.getElementById('sum').value || '').replace(/\D/g, ''), 10); if (!sum) { toast('Введите сумму'); break; } const r = redeem(d.id, sum); save(); closeSheet(); haptic('success'); toast('Списано ' + r + ' бонусов'); render(); break; }
-      case 'link-ask': openSheet(`<div class="grip"></div><h3>Привязать чек с кассы</h3><p class="small muted">Последние продажи из МойСклада. Выберите чек клиентки.</p><div class="card"><div class="list">${D.receipts.filter(r => !S.linked.includes(r.id)).map(r => `<div class="row row-plain" data-act="link-do" data-id="${d.id}" data-r="${r.id}" style="cursor:pointer"><div><div class="title">${esc(r.items)}</div><div class="sub">сегодня, ${r.time}</div></div><span class="price num">${fmt(r.sum)}</span></div>`).join('') || '<div class="empty"><p class="small">Все чеки привязаны</p></div>'}</div></div>`); break;
+      case 'link-ask': openSheet(`<div class="grip"></div><h3>Привязать чек с кассы</h3><p class="small muted">Последние продажи из МойСклада. Выберите чек клиента.</p><div class="card"><div class="list">${D.receipts.filter(r => !S.linked.includes(r.id)).map(r => `<div class="row row-plain" data-act="link-do" data-id="${d.id}" data-r="${r.id}" style="cursor:pointer"><div><div class="title">${esc(r.items)}</div><div class="sub">сегодня, ${r.time}</div></div><span class="price num">${fmt(r.sum)}</span></div>`).join('') || '<div class="empty"><p class="small">Все чеки привязаны</p></div>'}</div></div>`); break;
       case 'link-do': { const r = D.receipts.find(x => x.id === d.r); S.linked.push(r.id); const b = accrue(d.id, r.sum, r.items); save(); closeSheet(); haptic('success'); toast('Чек привязан, начислено ' + b + ' бонусов'); render(); break; }
       case 'stock': S.stockSel = null; openStock(d.m); break;
       case 'stock-pick': S.stockSel = +d.s; openStock(d.m); break;
       case 'arrive': arrive(+d.m, d.s); break;
       case 'lost-add': { const m = M(d.m); const key = isShoes(m) ? +d.s : 'one'; if (isShoes(m) && !D.SIZES.includes(key)) { toast('Выберите размер'); break; } addLost(m.id, isShoes(m) ? key : ''); save(); closeSheet(); haptic('warning'); toast('Записано в упущенный спрос'); render(); break; }
-      case 'lost-ask': openSheet(`<div class="grip"></div><h3>Не было размера</h3><p class="small muted">Два касания — и владелица увидит, что дозаказать.</p><div class="field"><span class="label">Модель</span><select class="select" id="lost-m">${D.models.filter(isShoes).map(m => `<option value="${m.id}">${esc(m.name)}</option>`).join('')}</select></div><div class="field"><span class="label">Размер</span><div class="sizes pick" id="lost-sizes">${D.SIZES.map(s => `<button class="size ${S.lostSel === s ? 'is-selected' : ''}" data-act="lost-pick" data-s="${s}">${s}</button>`).join('')}</div></div><button class="btn btn-primary btn-block" data-act="lost-save">Записать</button>`); break;
+      case 'lost-ask': openSheet(`<div class="grip"></div><h3>Не было размера</h3><p class="small muted">Два касания — и владелец увидит, что дозаказать.</p><div class="field"><span class="label">Модель</span><select class="select" id="lost-m">${D.models.filter(isShoes).map(m => `<option value="${m.id}">${esc(m.name)}</option>`).join('')}</select></div><div class="field"><span class="label">Размер</span><div class="sizes pick" id="lost-sizes">${D.SIZES.map(s => `<button class="size ${S.lostSel === s ? 'is-selected' : ''}" data-act="lost-pick" data-s="${s}">${s}</button>`).join('')}</div></div><button class="btn btn-primary btn-block" data-act="lost-save">Записать</button>`); break;
       case 'lost-pick': S.lostSel = +d.s; document.querySelectorAll('#lost-sizes .size').forEach(x => x.classList.toggle('is-selected', +x.dataset.s === S.lostSel)); break;
       case 'lost-save': { const mid = +document.getElementById('lost-m').value; if (!S.lostSel) { toast('Выберите размер'); break; } addLost(mid, S.lostSel); S.lostSel = null; save(); closeSheet(); haptic('warning'); toast('Записано в упущенный спрос'); render(); break; }
       case 'b-confirm': confirmBooking(d.id); break;
@@ -439,7 +439,7 @@
       case 'b-done': doneBooking(d.id); break;
       case 'b-release': release(d.id); break;
       case 'period': S.ownerPeriod = d.v; save(); toast(d.v === 'week' ? 'Неделя' : 'В прототипе показана неделя'); render(); break;
-      case 'approve': S.mailingApproved = true; save(); haptic('success'); toast('Рассылка уйдёт 12 клиенткам сегодня в 12:00'); render(); break;
+      case 'approve': S.mailingApproved = true; save(); haptic('success'); toast('Рассылка уйдёт 12 клиентам сегодня в 12:00'); render(); break;
     }
   });
   document.addEventListener('input', e => { const k = e.target.dataset.live; if (!k) return; S[k] = e.target.value; save(); const pos = e.target.selectionStart; render(); const el = document.querySelector(`[data-live="${k}"]`); if (el) { el.focus(); try { el.setSelectionRange(pos, pos); } catch (x) {} } });

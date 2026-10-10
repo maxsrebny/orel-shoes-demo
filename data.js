@@ -27,7 +27,7 @@ window.LEVITA_DATA = (function () {
     { name: 'Платина', pct: 10, from: 150000 }
   ];
 
-  // клиентки салона для режима персонала (имена вымышленные)
+  // клиенты салона для режима персонала (имена вымышленные)
   const clients = [
     { id: 'c1', name: 'Анна Л.', phone: '+7 910 ··· 12-07', card: '460252881380', level: 'Серебро', balance: 1775, expiring: { sum: 554, date: '14.10' }, sizes: { shoe: 38 }, spent: 41800, last: '02.10.2026', purchases: [{ date: '02.10.2026', model: 3, sum: 16900 }, { date: '14.09.2026', model: 12, sum: 15900 }, { date: '21.05.2026', model: 2, sum: 9000 }], birthday: '14.10' },
     { id: 'c2', name: 'Мария К.', phone: '+7 920 ··· 45-31', card: '460252881411', level: 'Золото', balance: 3240, expiring: null, sizes: { shoe: 39 }, spent: 92300, last: '29.09.2026', purchases: [{ date: '29.09.2026', model: 6, sum: 18900 }], birthday: '03.03' },
@@ -63,7 +63,7 @@ window.LEVITA_DATA = (function () {
     { model: 9, size: 38, count: 1, last: '02.10' }
   ];
 
-  // текущая клиентка (вы): бонусы и история
+  // текущий клиент (вы): бонусы и история
   const me = {
     phone: '+7 910 ··· 12-07', card: '460252881380', level: 'Серебро', balance: 1775, spent: 41800,
     expiring: { sum: 554, date: '14 октября' }, shoe: 38,
@@ -77,7 +77,7 @@ window.LEVITA_DATA = (function () {
     ]
   };
 
-  // «сообщения бота»: что клиентка получила бы в Telegram
+  // «сообщения бота»: что клиент получил бы в Telegram
   const inbox = [
     { date: 'сегодня, 09:10', text: 'Привезли 14 новых моделей. В вашем 38-м — 6. Посмотреть →', link: '#/new' },
     { date: '05.10', text: 'Напоминаем: 554 бонуса сгорят 14 октября. Успейте использовать на кассе.', link: '#/club' },
