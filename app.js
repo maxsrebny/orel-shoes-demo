@@ -18,14 +18,14 @@
     const stock = {}; D.models.forEach(m => { stock[m.id] = clone(m.stock); });
     const cb = {}; D.clients.forEach(c => { cb[c.id] = c.balance; });
     return {
-      v: 1, theme: 'auto', role: 'customer', staffOk: false, mySize: D.me.shoe, consentAds: true, fav: [3, 7],
-      bookings: clone(D.bookings), waitlist: clone(D.waitlist), lost: clone(D.lostDemand), ops: clone(D.ops || D.me.ops),
+      v: 2, theme: 'auto', role: 'customer', staffOk: false, mySize: D.me.shoe, consentAds: true, fav: [3, 7],
+      bookings: clone(D.bookings), waitlist: clone(D.waitlist), orders: clone(D.orders), lost: clone(D.lostDemand), ops: clone(D.ops || D.me.ops),
       balance: D.me.balance, spent: D.me.spent, inbox: clone(D.inbox), inboxRead: 0, stock, cb, linked: [],
       mailingApproved: false, rsvp: false, filter: 'all', q: '', newSeg: 'arrivals', ownerPeriod: 'week', sel: {}, photoIdx: {}
     };
   }
   let S = load();
-  function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 1) return s; } catch (e) {} return fresh(); }
+  function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 2) return s; } catch (e) {} return fresh(); }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 
   /* ---------- утилиты ---------- */
@@ -53,6 +53,9 @@
   const lastPair = m => isShoes(m) ? D.SIZES.some(s => stockOf(m, s) === 1) && D.SIZES.filter(s => stockOf(m, s) > 0).length <= 2 : stockOf(m, 'one') === 1;
   const isNew = m => m.arrived <= 3;
   const myBookings = () => S.bookings.filter(b => b.client === ME);
+  const myOrders = () => S.orders.filter(o => o.client === ME);
+  const methodName = o => o.method === 'door' ? 'курьер до двери' : 'пункт выдачи СДЭК';
+  function orderPill(o) { return o.status === 'new' ? pill('pill-warn', 'Ждёт ответа') : o.status === 'confirmed' ? pill('pill-ok', 'Подтверждено') : o.status === 'shipped' ? pill('pill-ok', 'Отправлено') : pill('pill-neutral', 'Нет в наличии'); }
   const myWait = () => S.waitlist.filter(w => w.client === ME);
   const unread = () => Math.max(0, S.inbox.length - S.inboxRead);
   function pushInbox(text, link) { S.inbox.unshift({ date: 'сейчас', text, link: link || '' }); }
@@ -170,6 +173,11 @@
       sizes = `<p class="small muted">${n ? 'В наличии: ' + plural(n, 'штука', 'штуки', 'штук') : 'Сейчас нет в наличии'}</p>`;
       cta = n ? (myB ? `<div class="card card-soft"><div class="between"><div><div class="label">Ваша бронь</div><div class="small">${myB.status === 'held' ? 'Ждёт вас ' + esc(myB.until) : 'Продавец подтвердит в течение 30 минут'}</div></div>${statusPill(myB)}</div></div>` : `<button class="btn btn-primary btn-block" data-act="book-ask" data-m="${m.id}" data-s="one">Отложить до завтра</button>`) : `<button class="btn btn-primary btn-block" data-act="wait-ask" data-m="${m.id}" data-s="one">Сообщить, когда появится</button>`;
     }
+    const myO = myOrders().find(o => o.model === m.id && o.status !== 'declined');
+    let ship = '';
+    if (myO) ship = `<div class="card card-soft"><div class="between"><div><div class="label">Доставка${myO.size ? ' · ' + myO.size : ''}</div><div class="small">${myO.status === 'new' ? 'продавец подтвердит наличие' : myO.status === 'confirmed' ? 'пара отложена, ссылка на оплату в сообщениях' : 'отправлено, трек ' + esc(myO.track)}</div></div>${orderPill(myO)}</div></div>`;
+    else if (isShoes(m)) { if (sel && sizeState(m, sel) !== 'none') ship = `<button class="btn btn-secondary btn-block" data-act="ship-ask" data-m="${m.id}" data-s="${sel}">Запросить доставку · ${sel}</button>`; }
+    else if (stockOf(m, 'one')) ship = `<button class="btn btn-secondary btn-block" data-act="ship-ask" data-m="${m.id}" data-s="one">Запросить доставку</button>`;
     const similar = D.models.filter(x => x.id !== m.id && x.cat === m.cat && (x.type === m.type || x.color === m.color)).slice(0, 2);
     return topbar(backBtn(), isNew(m) ? 'Новинки' : 'Каталог', `<button class="icon-btn" data-act="fav" data-m="${m.id}" aria-label="В избранное">${fav ? '♥' : '♡'}</button>`) +
       `<div class="hero" data-act="photo-next" data-m="${m.id}"><img class="fade-in" src="${photo(m, idx)}" alt="">${lastPair(m) ? '<span class="badge badge-accent">Последняя пара</span>' : (isNew(m) ? '<span class="badge">Новинка</span>' : '')}${m.photos.length > 1 ? `<div class="dots">${m.photos.map((p, i) => `<i class="${i === idx ? 'is-on' : ''}"></i>`).join('')}</div>` : ''}</div>
@@ -179,8 +187,9 @@
         <div class="between"><span class="price" style="font-size:22px">${fmt(m.price)}</span><span class="caption">цвет: ${esc(m.color)} · арт. 26-${String(1100 + m.id)}</span></div>
         ${sizes}
         ${cta}
+        ${ship}
         <div class="cluster"><button class="btn btn-secondary btn-sm" data-act="ask" data-m="${m.id}">Спросить продавца</button><button class="btn btn-secondary btn-sm" data-act="share-model" data-m="${m.id}">Поделиться</button></div>
-        <p class="caption">Пара ждёт вас до конца следующего дня. Оплата в салоне, бонусы клуба на кассе.</p>
+        <p class="caption">Пара ждёт вас до конца следующего дня, оплата в салоне. Доставка по России: ссылка на оплату и отправка СДЭК после подтверждения продавца.</p>
         ${similar.length ? `<div class="divider"></div><h3>Похожие в салоне</h3><div class="grid-2">${similar.map(tile).join('')}</div>` : ''}
       </div>`;
   }
@@ -214,6 +223,7 @@
           ${ww.map(w => { const m = M(w.model); return `<div class="row"><img class="thumb" src="${photo(m)}" alt=""><div><div class="title">${esc(m.name)}${isShoes(m) ? ' · ' + w.size : ''}</div><div class="sub">${w.notified ? 'размер появился в салоне' : 'сообщим, когда появится'}</div></div>${w.notified ? pill('pill-ok', 'Появился') : pill('pill-neutral', 'Ждём')}</div>`; }).join('')}
           ${!bw.length && !ww.length ? '<div class="empty"><h3>Пока пусто</h3><p class="small">Отложите пару в карточке модели — она появится здесь.</p></div>' : ''}
         </div></div>
+        ${myOrders().length ? `<div class="card"><div class="between"><h3>Доставка</h3><span class="caption">${myOrders().length}</span></div><div class="list">${myOrders().map(o => { const m = M(o.model); return `<div class="row"><img class="thumb" src="${photo(m)}" alt=""><div><div class="title">${esc(m.name)}${o.size ? ' · ' + o.size : ''}</div><div class="sub">${esc(o.city)} · ${methodName(o)}${o.status === 'new' ? ' · продавец подтвердит наличие' : o.status === 'confirmed' ? ' · ссылка на оплату в сообщениях' : o.status === 'shipped' ? ' · трек ' + esc(o.track) : ' · сейчас нет в наличии'}</div></div>${orderPill(o)}</div>`; }).join('')}</div></div>` : ''}
         <div class="card"><div class="between"><h3>Пригласить подругу</h3></div><p class="small muted" style="margin:6px 0 10px">Подруга получит 500 бонусов на первую покупку, вы — 500 после неё.</p><button class="btn btn-secondary btn-block" data-act="share-ref">Отправить приглашение</button></div>
         <div class="card ops"><div class="between"><h3>История бонусов</h3></div><div class="list">${S.ops.map(o => `<div class="row row-plain"><div><div class="title">${esc(o.title)}</div><div class="sub">${esc(o.date)} · ${esc(o.note)}</div></div><span class="sum ${o.sum > 0 ? 'plus' : 'minus'}">${o.sum > 0 ? '+' : '−'}${num(Math.abs(o.sum))}</span></div>`).join('')}</div></div>
       </div>`;
@@ -253,6 +263,9 @@
         <div class="summary"><div class="kpi"><div class="v num">${pend.length}</div><div class="k">ждут ответа</div></div><div class="kpi"><div class="v num">${held.length}</div><div class="k">отложено</div></div><div class="kpi"><div class="v num">${wl.length}</div><div class="k">запросов на размер</div></div></div>
         <div class="card"><div class="between"><h3>Брони</h3><button class="btn btn-ghost btn-sm" data-act="lost-ask">Не было размера</button></div><div class="list">
           ${bk.map(b => { const m = M(b.model), c = C(b.client); return `<div class="row ${b.status === 'pending' ? 'is-pending' : ''}"><img class="thumb" src="${photo(m)}" alt=""><div><div class="title">${esc(c.name)} · ${esc(m.name)}${isShoes(m) ? ' · ' + b.size : ''}</div><div class="sub">${b.status === 'pending' ? 'запрос ' + esc(b.created) : 'отложено до ' + esc(b.until)}</div><div class="act" style="margin-top:6px">${b.status === 'pending' ? `<button class="btn btn-primary" data-act="b-confirm" data-id="${b.id}">Подтвердить</button><button class="btn btn-secondary" data-act="b-notfound" data-id="${b.id}">Не нашли</button>` : `<button class="btn btn-primary" data-act="b-done" data-id="${b.id}">Куплена</button><button class="btn btn-secondary" data-act="b-release" data-id="${b.id}">Снять</button>`}</div></div>${statusPill(b)}</div>`; }).join('') || '<div class="empty"><h3>Броней нет</h3></div>'}
+        </div></div>
+        <div class="card"><div class="between"><h3>Заявки на доставку</h3><span class="caption">оплата и отправка — вручную</span></div><div class="list">
+          ${S.orders.filter(o => o.status === 'new' || o.status === 'confirmed').sort((a, b) => (a.status === 'new' ? 0 : 1) - (b.status === 'new' ? 0 : 1)).map(o => { const m = M(o.model), c = C(o.client); return `<div class="row ${o.status === 'new' ? 'is-pending' : ''}"><img class="thumb" src="${photo(m)}" alt=""><div><div class="title">${esc(c.name)} · ${esc(m.name)}${o.size ? ' · ' + o.size : ''}</div><div class="sub">${esc(o.city)} · ${methodName(o)} · ${esc(o.address)}</div><div class="act" style="margin-top:6px">${o.status === 'new' ? `<button class="btn btn-primary" data-act="o-confirm" data-id="${o.id}">Подтвердить</button><button class="btn btn-secondary" data-act="o-decline" data-id="${o.id}">Нет в наличии</button>` : `<button class="btn btn-primary" data-act="o-ship-ask" data-id="${o.id}">Отправлено</button>`}</div></div>${orderPill(o)}</div>`; }).join('') || '<div class="empty"><h3>Заявок нет</h3><p class="small">Когда клиент нажмёт «Запросить доставку», заявка появится здесь и в боте продавца.</p></div>'}
         </div></div>
         <div class="card"><div class="between"><h3>Запросы на размер</h3><span class="caption">лист ожидания</span></div><div class="list">
           ${wl.map(w => { const m = M(w.model), c = C(w.client); return `<div class="row"><img class="thumb" src="${photo(m)}" alt=""><div><div class="title">${esc(c.name)} · ${esc(m.name)} · ${w.size}</div><div class="sub">ждёт с ${esc(w.created)} · сейчас ${stockOf(m, w.size) ? 'есть ' + stockOf(m, w.size) : 'нет'}</div></div><button class="btn btn-secondary btn-sm" data-act="arrive" data-m="${m.id}" data-s="${w.size}">Пришёл</button></div>`; }).join('') || '<div class="empty"><h3>Запросов нет</h3><p class="small">Когда клиент нажмёт «Сообщить, когда появится», запрос появится здесь.</p></div>'}
@@ -359,6 +372,25 @@
     pushInbox('Сообщим, когда появится ' + m.name + (s !== 'one' ? ', ' + s : '') + '.', '#/club');
     save(); closeSheet(); haptic('success'); toast('Запрос на размер записан'); render();
   }
+  function shipAsk(m, s) {
+    S.shipMethod = S.shipMethod || 'pvz';
+    openSheet(`<div class="grip"></div><h3>Запросить доставку</h3><p class="small muted">${esc(m.name)}${s !== 'one' ? ' · ' + s : ''}. Продавец подтвердит наличие, пришлёт ссылку на оплату и отправит СДЭК. Трек-номер придёт в Telegram.</p>
+      <div class="field"><span class="label">Город</span><div class="input"><input id="ship-city" placeholder="Например, Москва"></div></div>
+      <div class="segmented">${[['pvz', 'Пункт выдачи СДЭК'], ['door', 'Курьер до двери']].map(x => `<button class="${S.shipMethod === x[0] ? 'is-active' : ''}" data-act="ship-method" data-v="${x[0]}">${x[1]}</button>`).join('')}</div>
+      <div class="field"><span class="label">Адрес или пункт выдачи</span><div class="input"><input id="ship-addr" placeholder="Улица и дом или адрес ПВЗ"></div></div>
+      <button class="btn btn-primary btn-block" data-act="ship" data-m="${m.id}" data-s="${s}">Отправить запрос</button><button class="btn btn-secondary btn-block" data-act="close">Отмена</button>`);
+  }
+  function ship(m, s) {
+    const city = ((document.getElementById('ship-city') || {}).value || '').trim() || 'Москва';
+    const addr = ((document.getElementById('ship-addr') || {}).value || '').trim() || (S.shipMethod === 'door' ? 'адрес уточним в Telegram' : 'ближайший ПВЗ СДЭК');
+    S.orders.unshift({ id: 'o' + Date.now(), client: ME, model: m.id, size: s === 'one' ? '' : +s, city, method: S.shipMethod || 'pvz', address: addr, status: 'new', created: 'только что', track: '' });
+    pushInbox('Запрос на доставку принят: ' + m.name + (s !== 'one' ? ', ' + s : '') + ', ' + city + '. Продавец подтвердит наличие и пришлёт ссылку на оплату.', '#/club');
+    save(); closeSheet(); haptic('success'); toast('Запрос отправлен продавцу'); render();
+  }
+  function confirmOrder(id) { const o = S.orders.find(x => x.id === id); if (!o) return; const m = M(o.model); o.status = 'confirmed'; const key = o.size || 'one'; if (S.stock[m.id][key] > 0) S.stock[m.id][key]--; if (o.client === ME) pushInbox('Заявка подтверждена: ' + m.name + (o.size ? ', ' + o.size : '') + ' отложены для вас. Ссылка на оплату: pay.levita.demo/' + o.id.slice(-4) + ' (в приложении — ссылка от банка салона). После оплаты отправим СДЭК.', '#/club'); save(); haptic('success'); toast('Пара зарезервирована, клиенту ушла ссылка на оплату'); render(); }
+  function declineOrder(id) { const o = S.orders.find(x => x.id === id); if (!o) return; o.status = 'declined'; addLost(o.model, o.size); if (o.client === ME) pushInbox('К сожалению, ' + M(o.model).name + (o.size ? ' в ' + o.size : '') + ' сейчас нет. Мы записали ваш размер и сообщим, когда привезём.', '#/club'); if (!S.waitlist.find(w => w.client === o.client && w.model === o.model && w.size === o.size)) S.waitlist.unshift({ id: 'w' + Date.now(), client: o.client, model: o.model, size: o.size, created: 'сегодня' }); save(); haptic('warning'); toast('Отмечено в упущенном спросе, клиент в листе ожидания'); render(); }
+  function shipAskStaff(id) { openSheet(`<div class="grip"></div><h3>Отправлено</h3><p class="small muted">Введите трек-номер СДЭК — клиент получит его в Telegram, бонусы за покупку начислятся.</p><div class="field"><span class="label">Трек-номер СДЭК</span><div class="input"><input id="track-in" value="1023456789" inputmode="numeric"></div></div><button class="btn btn-primary btn-block" data-act="o-ship" data-id="${id}">Отправить клиенту</button><button class="btn btn-secondary btn-block" data-act="close">Отмена</button>`); }
+  function shipOrder(id) { const o = S.orders.find(x => x.id === id); if (!o) return; const m = M(o.model); o.status = 'shipped'; o.track = ((document.getElementById('track-in') || {}).value || '').trim() || '1023456789'; accrue(o.client, m.price, m.name); if (o.client === ME) pushInbox('Отправлено: ' + m.name + (o.size ? ', ' + o.size : '') + '. Трек СДЭК ' + o.track + ' — следите в приложении СДЭК. Бонусы за покупку начислены.', '#/club'); save(); closeSheet(); haptic('success'); toast('Клиенту ушёл трек, бонусы начислены'); render(); }
   function confirmBooking(id) { const b = S.bookings.find(x => x.id === id); if (!b) return; b.status = 'held'; b.until = 'завтра, 20:00'; if (b.client === ME) pushInbox('Пара отложена: ' + M(b.model).name + (b.size ? ', ' + b.size : '') + '. Ждёт вас в салоне до завтра, 20:00.', '#/club'); save(); haptic('success'); toast('Подтверждено, клиенту ушло сообщение'); render(); }
   function notFound(id) { const b = S.bookings.find(x => x.id === id); if (!b) return; b.status = 'cancelled'; addLost(b.model, b.size); if (b.client === ME) pushInbox('К сожалению, ' + M(b.model).name + (b.size ? ' в ' + b.size : '') + ' сейчас нет. Мы записали ваш размер и сообщим, когда привезём.', '#/club'); if (!S.waitlist.find(w => w.client === b.client && w.model === b.model && w.size === b.size)) S.waitlist.unshift({ id: 'w' + Date.now(), client: b.client, model: b.model, size: b.size, created: 'сегодня' }); save(); haptic('warning'); toast('Отмечено в упущенном спросе, клиент в листе ожидания'); render(); }
   function doneBooking(id) { const b = S.bookings.find(x => x.id === id); if (!b) return; const m = M(b.model); b.status = 'done'; const key = b.size || 'one'; if (S.stock[m.id][key] > 0) S.stock[m.id][key]--; accrue(b.client, m.price, m.name); save(); haptic('success'); toast('Покупка отмечена, бонусы начислены'); render(); }
@@ -399,6 +431,13 @@
       case 'book': book(M(d.m), d.s); break;
       case 'wait-ask': waitAsk(M(d.m), d.s); break;
       case 'wait': wait(M(d.m), d.s); break;
+      case 'ship-ask': shipAsk(M(d.m), d.s); break;
+      case 'ship-method': S.shipMethod = d.v; document.querySelectorAll('#sheet .segmented button').forEach(b => b.classList.toggle('is-active', b.dataset.v === d.v)); break;
+      case 'ship': ship(M(d.m), d.s); break;
+      case 'o-confirm': confirmOrder(d.id); break;
+      case 'o-decline': declineOrder(d.id); break;
+      case 'o-ship-ask': shipAskStaff(d.id); break;
+      case 'o-ship': shipOrder(d.id); break;
       case 'ask': openSheet(`<div class="grip"></div><h3>Спросить продавца</h3><p class="small muted">Ответим в Telegram в рабочее время салона: пн–пт 10:00–20:00, сб–вс 10:00–19:00.</p><textarea class="input" id="ask-text" placeholder="Например: маломерят ли, есть ли в другом цвете, можно ли отложить две пары"></textarea><button class="btn btn-primary btn-block" data-act="ask-send" data-m="${d.m}">Отправить</button>`); break;
       case 'ask-send': closeSheet(); haptic('success'); toast('Вопрос отправлен, ответим в Telegram'); break;
       case 'share-model': { const m = M(d.m); shareText('Смотри, какие ' + m.name.toLowerCase() + ' в ЛеВите: ' + fmt(m.price), 'https://t.me/' + BOT + '?startapp=model_' + m.id); break; }
@@ -413,7 +452,7 @@
       case 'pin': openPin(); break;
       case 'pin-key': { if (d.k === '⌫') S.pin = (S.pin || '').slice(0, -1); else if ((S.pin || '').length < 4) S.pin = (S.pin || '') + d.k; const dots = document.querySelectorAll('#pin-dots i'); dots.forEach((x, i) => x.classList.toggle('on', i < S.pin.length)); if (S.pin.length === 4) { if (S.pin === '1111') { S.staffOk = true; S.role = 'staff'; save(); closeSheet(); haptic('success'); nav('#/staff/today'); } else { S.pin = ''; dots.forEach(x => x.classList.remove('on')); haptic('error'); toast('Неверный PIN. Демо: 1111'); } } break; }
       case 'guide': openSheet(`<div class="grip"></div><h3>Как смотреть демо</h3><div class="stack">
-        ${[['Каталог', 'откройте лодочки, выберите 38 — «Отложить на примерку»'], ['Новинки', 'переключите «В моём размере», запишитесь на закрытый показ'], ['Клуб', 'карта с QR, «Показать на кассе», история бонусов, приглашение'], ['Профиль → Для персонала', 'PIN 1111: на экране «Сегодня» подтвердите вашу бронь, потом «Куплена»'], ['Наличие', 'откройте модель, «Не было размера» и «Поступление +1» — клиент получит сообщение'], ['Ещё → Кабинет владельца', 'цифры недели, упущенный спрос, «Одобрить рассылку»'], ['Профиль', 'переключите тему и сбросьте демо перед следующим показом']].map((s, i) => `<div class="step"><b>${i + 1}</b><div><div class="small" style="font-weight:600">${s[0]}</div><div class="small muted">${s[1]}</div></div></div>`).join('')}
+        ${[['Каталог', 'откройте лодочки, выберите 38 — «Отложить на примерку»'], ['Новинки', 'переключите «В моём размере», запишитесь на закрытый показ'], ['Клуб', 'карта с QR, «Показать на кассе», история бонусов, приглашение'], ['Профиль → Для персонала', 'PIN 1111: на экране «Сегодня» подтвердите вашу бронь, потом «Куплена»'], ['Наличие', 'откройте модель, «Не было размера» и «Поступление +1» — клиент получит сообщение'], ['Карточка → размер → «Запросить доставку»', 'город и адрес — заявка уходит продавцу; Персонал → Сегодня → «Подтвердить», затем «Отправлено» с треком: клиент видит статусы в Клубе и сообщениях'], ['Ещё → Кабинет владельца', 'цифры недели, упущенный спрос, «Одобрить рассылку»'], ['Профиль', 'переключите тему и сбросьте демо перед следующим показом']].map((s, i) => `<div class="step"><b>${i + 1}</b><div><div class="small" style="font-weight:600">${s[0]}</div><div class="small muted">${s[1]}</div></div></div>`).join('')}
         </div><button class="btn btn-secondary btn-block" data-act="close">Закрыть</button>`); break;
       case 'reset': openSheet(`<div class="grip"></div><h3>Сбросить демо?</h3><p class="small muted">Вернутся исходные брони, бонусы и остатки.</p><button class="btn btn-primary btn-block" data-act="reset-yes">Сбросить</button><button class="btn btn-secondary btn-block" data-act="close">Отмена</button>`); break;
       case 'reset-yes': try { localStorage.removeItem(KEY); } catch (x) {} S = fresh(); closeSheet(); applyTheme(); toast('Демо сброшено'); nav('#/catalog'); break;

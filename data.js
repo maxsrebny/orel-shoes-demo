@@ -56,6 +56,11 @@ window.LEVITA_DATA = (function () {
     { id: 'w2', client: 'c5', model: 3, size: 40, created: '01.10' },
     { id: 'w3', client: 'c1', model: 9, size: 38, created: '28.09' }
   ];
+  // заявки на доставку (шаг 3: оплата и отправка — вручную, как сейчас; приложение структурирует заявку и статусы)
+  const orders = [
+    { id: 'o1', client: 'c4', model: 7, size: 36, city: 'Москва', method: 'pvz', address: 'ПВЗ СДЭК, Тверская, 12', status: 'confirmed', created: 'вчера', track: '' },
+    { id: 'o2', client: 'c2', model: 11, size: '', city: 'Курск', method: 'door', address: 'ул. Ленина, 5, кв. 10', status: 'shipped', created: '03.10', track: '1023456001' }
+  ];
   const lostDemand = [
     { model: 3, size: 35, count: 2, last: '06.10' },
     { model: 7, size: 36, count: 3, last: '05.10' },
@@ -90,5 +95,5 @@ window.LEVITA_DATA = (function () {
     { d: 'чт', rev: 46, checks: 5, club: 2 }, { d: 'пт', rev: 93, checks: 9, club: 4 }, { d: 'сб', rev: 128, checks: 12, club: 5 }, { d: 'вс', rev: 84, checks: 8, club: 3 }
   ];
 
-  return { SIZES, models, levels, clients, receipts, bookings, waitlist, lostDemand, me, inbox, week };
+  return { SIZES, models, levels, clients, receipts, bookings, waitlist, orders, lostDemand, me, inbox, week };
 })();
