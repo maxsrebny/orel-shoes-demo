@@ -1,5 +1,5 @@
 /* ЛеВита — кликабельный прототип Telegram Mini App (Вариант 2 «Клуб салона»).
-   Три роли: покупательница (по умолчанию), персонал (PIN 1111), кабинет владельца (из меню персонала).
+   Три роли: покупатель (по умолчанию), персонал (PIN 1111), кабинет владельца (из меню персонала).
    Без сервера: состояние хранится в браузере, кнопка «Сбросить демо» в профиле. */
 (function () {
   'use strict';
@@ -129,7 +129,7 @@
   const pill = (cls, t) => `<span class="pill ${cls}">${t}</span>`;
   const statusPill = b => ({ pending: pill('pill-warn', 'Ждёт ответа'), held: pill('pill-ok', 'Отложено'), done: pill('pill-neutral', 'Куплено'), cancelled: pill('pill-danger', 'Снято') }[b.status] || '');
 
-  /* ---------- экраны покупательницы ---------- */
+  /* ---------- экраны покупателя ---------- */
   function vCatalog() {
     const q = S.q.trim().toLowerCase();
     let list = D.models.filter(m => {
@@ -287,7 +287,7 @@
         <div class="card"><div class="list">
           <div class="row row-plain"><div><div class="title">Кабинет владельца</div><div class="sub">выручка, клуб, брони, дайджест</div></div><button class="btn btn-secondary btn-sm" data-act="nav" data-to="#/owner">Открыть</button></div>
           <div class="row row-plain"><div><div class="title">Приёмка и инвентаризация</div><div class="sub">открывается МойСклад</div></div><button class="btn btn-secondary btn-sm" data-act="toast" data-t="В прототипе: открылся бы МойСклад">Открыть</button></div>
-          <div class="row row-plain"><div><div class="title">Выйти из режима персонала</div><div class="sub">вернуться к экрану покупательницы</div></div><button class="btn btn-secondary btn-sm" data-act="staff-exit">Выйти</button></div>
+          <div class="row row-plain"><div><div class="title">Выйти из режима персонала</div><div class="sub">вернуться к экрану покупателя</div></div><button class="btn btn-secondary btn-sm" data-act="staff-exit">Выйти</button></div>
         </div></div>
       </div>`;
   }
