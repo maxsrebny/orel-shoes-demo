@@ -76,7 +76,8 @@ textarea.input{height:auto;min-height:88px;padding:10px 14px;resize:vertical;ali
 .step b{width:28px;height:28px;border-radius:50%;background:var(--accent-soft);display:inline-flex;align-items:center;justify-content:center;font:600 13px var(--font-body)}
 .fade-in{animation:fade var(--dur-slow) var(--ease)}
 @keyframes fade{from{opacity:0}to{opacity:1}}
-.staff-badge{font-size:var(--fs-label);letter-spacing:var(--ls-label);text-transform:uppercase;color:var(--accent);font-weight:600}
+.staff-badge{font-size:var(--fs-label);letter-spacing:var(--ls-label);text-transform:uppercase;color:var(--accent);font-weight:600;white-space:nowrap;justify-self:end}
+.topbar:has(.staff-badge){grid-template-columns:44px 1fr auto}
 .table{width:100%;border-collapse:collapse;font-size:14px}
 .table td,.table th{padding:8px 0;border-top:1px solid var(--line);text-align:left;vertical-align:top}
 .table th{font-size:var(--fs-caption);color:var(--muted);font-weight:600;border-top:0}
